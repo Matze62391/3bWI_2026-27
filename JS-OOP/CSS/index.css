@@ -1,0 +1,13 @@
+body {
+    width: 100%;
+}
+
+img {
+    width: 20%;
+    object-fit: cover;
+}
+
+.katze {
+    position: absolute;
+    width: 20%;
+}

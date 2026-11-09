@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+ 
+        .pega {
+            position: absolute;
+            width: 200px;
+        }
+    </style>
+</head>
+ 
+<body>
+    <script>
+        const namesliste = ["hugo", "hans", "otto", "lisa", "susi"];
+        const farbenlsite = ["grau", "braun", "schwarz", "weiss", "rosa"];
+        const true_false = [true, false];
+        const geschlechtliste = ["m", "w"];
+        const ele_arrayname = ["name", "farbe", "geschlecht", "position_x", "position_y", "hoehe", "gewicht", "alter", "fluegellaenge", "breite", "geschwindigkeit", "istamfliegen", "istamkaken", "anzahl_fluegel"];
+        // hoehe cm, gewicht kg, alter Jahre, fluegellaenge cm, breite cm, geschwindigkeit kmh
+        const ele_array = ["hugo", "grau", "w", 0, 1, 280, 890, 50, 409, 187, 9, false, false, 2];
+        const ele_liste = [];
+        ele_liste.push(ele_array);
+
+        function create_image_pega(left, right, index) {
+            let img = document.createElement('img');
+            img.id = `bild${index}`; // pega0, pega1, pega2, ...
+            img.src = "media/pega.png";
+            img.className = "pega";
+            img.style.left =  left + "px";
+            img.style.top =  right + "px";
+            document.body.appendChild(img);
+            return img;
+        }
+
+        function init_ele_liste(n) {
+            for (let i = 0; i < n; i++) {
+                // Zufallswerte für jeden Elefanten neu auswählen
+                let random_name = namesliste[Math.floor(Math.random() * namesliste.length)];
+                let random_farbe = farbenlsite[Math.floor(Math.random() * farbenlsite.length)];
+                let random_geschlecht = geschlechtliste[Math.floor(Math.random() * geschlechtliste.length)];
+                let random_fliegen = true_false[Math.floor(Math.random() * true_false.length)];
+                let random_kaken = true_false[Math.floor(Math.random() * true_false.length)];
+
+                // Zahlen werden vom ersten Elefanten (ele_array) übernommen
+                let new_ele_array = [random_name, random_farbe, random_geschlecht, ele_array[3], ele_array[4], ele_array[5], ele_array[6], ele_array[7], ele_array[8], ele_array[9], ele_array[10], random_fliegen, random_kaken, ele_array[13]];
+                ele_liste.push(new_ele_array);
+            }
+        }
+        function print_array(pegaphant) {
+            for (let i = 0; i < pegaphant.length; i++) {
+                console.log(ele_arrayname[i] + ": " + pegaphant[i]);
+            }
+        }
+        function print_array_liste(pegaphantliste) {
+            for (let i = 0; i < pegaphantliste.length; i++) {
+                console.log(`Elefant ${i + 1}:`);
+                print_array(pegaphantliste[i]);
+            }
+
+        }
+        // Index im Array: 0 name, 1 farbe, 2 geschlecht, 4 position_y, 7 alter, 10 geschwindigkeit, 11 istamfliegen, 13 anzahl_fluegel
+        function print_info(pegaphant) {
+            console.log(`name: ${pegaphant[0]} farbe: ${pegaphant[1]} geschlecht: ${pegaphant[2]} ${pegaphant[7]} ${pegaphant[13]}`);
+        }
+
+        function ele_fliegt(pegaphant) {
+            pegaphant[10] = 300; //kmh
+            pegaphant[11] = true;
+            pegaphant[4] = pegaphant[4] + 1;
+        }
+
+        init_ele_liste(3);
+
+        // Jeder Pegaphant in der Liste fliegt los
+        for (let i = 0; i < ele_liste.length; i++) {
+            print_info(ele_liste[i]);
+            ele_fliegt(ele_liste[i]);
+            print_info(ele_liste[i]);
+        }
+
+        print_array_liste(ele_liste);
+    </script>
+ 
+    <script>
+        // Für jeden Pegaphanten: ein Bild, eine Position, eine Richtung (gleicher Index wie ele_liste)
+        const bilder = [];
+        const positionen = [];
+        const richtungen = [];
+        const positionen_y = [];
+        const richtungen_y = [];
+
+        // Erstellt ein Bild für einen Pegaphanten und gibt es zurück
+        
+
+        for (let i = 0; i < ele_liste.length; i++) {
+            let random_y = Math.random() * (window.innerHeight - 200); // zufällige Höhe, damit das Bild im Fenster bleibt
+            let bild = create_image_pega(10 + Math.random() * 70, random_y, i);
+
+            bilder.push(bild);
+            positionen.push(10 + Math.random() * 70); // Startposition zwischen 10% und 80%
+            richtungen.push(true_false[Math.floor(Math.random() * 2)] ? 1 : -1); // -1 = links, 1 = rechts
+            positionen_y.push(10 + Math.random() * 60); // Starthöhe zwischen 10% und 70%
+            richtungen_y.push(true_false[Math.floor(Math.random() * 2)] ? 1 : -1); // -1 = hoch, 1 = runter
+        }
+
+        function animate() {
+            for (let i = 0; i < bilder.length; i++) {
+                // Aktualisiere die Position
+                positionen[i] += richtungen[i] * 0.5; // Bewegungsgeschwindigkeit
+                positionen_y[i] += richtungen_y[i] * 0.3; // Bewegungsgeschwindigkeit hoch/runter
+                // Ändere die Richtung, wenn der Elefant den Rand erreicht
+                // FEHLER: vorher stand hier "position" und "richtung" -> diese Variablen gibt es nicht!
+                // Richtig ist das Array mit Index: positionen[i] und richtungen[i]
+                if (positionen[i] <= 10) {
+                    richtungen[i] = 1; // Bewege nach rechts
+                } else if (positionen[i] >= 80) {
+                    richtungen[i] = -1; // Bewege nach links
+                }
+                // Gleiches für hoch/runter
+                if (positionen_y[i] <= 10) {
+                    richtungen_y[i] = 1; // Bewege nach unten
+                } else if (positionen_y[i] >= 70) {
+                    richtungen_y[i] = -1; // Bewege nach oben
+                }
+                // Setze die neue Position
+                // FEHLER: vorher war hier eine zweite Schleife mit demselben "i",
+                // die ALLEN Elefanten dieselbe Position gegeben hat. Eine Zeile reicht:
+                ele_liste[i][3] = positionen[i];
+                //ele_liste[i][4] = positionen_y[i];
+                bilder[i].style.left = `${positionen[i]}%`;
+                // FEHLER: vorher wurde "top" auf die x-Position gesetzt -> jetzt positionen_y[i]
+                //bilder[i].style.top = `${positionen_y[i]}%`;
+            }
+            // Führe die Animation erneut aus
+            requestAnimationFrame(animate);
+        }
+       
+        animate();
+    </script>
+</body>
+ 
+</html>
